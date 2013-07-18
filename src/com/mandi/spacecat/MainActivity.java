@@ -36,6 +36,9 @@ public class MainActivity extends SimpleBaseGameActivity
 	private static final int CAMERA_HEIGHT = 1280;
 
 	private Sprite mSpaceCat;
+
+    Entity mSpaceCatLayer = new Entity();
+    Entity mBackgroundLayer = new Entity();
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() 
@@ -79,69 +82,36 @@ public class MainActivity extends SimpleBaseGameActivity
 	private final float kCATSPEED = 500f;
 	private final float kBGSPEED  = 80f;
 	
+	private void createBackgroundSprite(ITextureRegion bg, final float initialHeight, final float speed)
+	{
+	    // background
+	    Sprite background = new Sprite(0, initialHeight, bg, getVertexBufferObjectManager())
+	    {
+	    	@Override
+	    	protected void onManagedUpdate(float pSecondsElapsed) 
+	    	{
+	    		this.setY(this.getY() + speed * pSecondsElapsed);
+	    		if (getY() >= CAMERA_HEIGHT) setY(-CAMERA_HEIGHT);
+	    		super.onManagedUpdate(pSecondsElapsed);
+	    	}
+	    };
+	    
+	    mBackgroundLayer.attachChild(background);
+	}
+	
 	@Override
 	protected Scene onCreateScene() 
 	{
 		Scene scene = new Scene();
 	    scene.setBackground(new Background(0.0f, 0.0f, 0.0f));
 	   
-	    Entity spaceCatLayer = new Entity();
-	    Entity backgroundLayer = new Entity();
-	   
-	    scene.attachChild(backgroundLayer);
-	    scene.attachChild(spaceCatLayer);
+	    scene.attachChild(mBackgroundLayer);
+	    scene.attachChild(mSpaceCatLayer);
 	    
-	    // background
-	    Sprite background1 = new Sprite(0, 0, mTRBackground, getVertexBufferObjectManager())
-	    {
-	    	@Override
-	    	protected void onManagedUpdate(float pSecondsElapsed) 
-	    	{
-	    		this.setY(this.getY() + kBGSPEED * pSecondsElapsed);
-	    		if (getY() >= CAMERA_HEIGHT) setY(-CAMERA_HEIGHT);
-	    		super.onManagedUpdate(pSecondsElapsed);
-	    	}
-	    };
-	    Sprite background2 = new Sprite(0, -CAMERA_HEIGHT, mTRBackground, getVertexBufferObjectManager())
-	    {
-	    	@Override
-	    	protected void onManagedUpdate(float pSecondsElapsed) 
-	    	{
-	    		this.setY(this.getY() + kBGSPEED * pSecondsElapsed);
-	    		if (getY() >= CAMERA_HEIGHT) setY(-CAMERA_HEIGHT);
-	    		super.onManagedUpdate(pSecondsElapsed);
-	    	}
-	    };
-	    
-	    background1.setTag(123);
-	    background2.setTag(234);
-	    
-	    backgroundLayer.attachChild(background1);
-	    backgroundLayer.attachChild(background2);
-	    
-	    Sprite starfield1 = new Sprite(0, 0, mTRStarfield, getVertexBufferObjectManager())
-	    {
-	    	@Override
-	    	protected void onManagedUpdate(float pSecondsElapsed) {
-	    		// TODO Auto-generated method stub
-	    		this.setY(this.getY() + kBGSPEED * 2 * pSecondsElapsed);
-	    		if (getY() >= CAMERA_HEIGHT) setY(-CAMERA_HEIGHT);
-	    		super.onManagedUpdate(pSecondsElapsed);
-	    	}
-	    };
-	    
-	    Sprite starfield2 = new Sprite(0, -CAMERA_HEIGHT, mTRStarfield, getVertexBufferObjectManager())
-	    {
-	    	@Override
-	    	protected void onManagedUpdate(float pSecondsElapsed) {
-	    		this.setY(this.getY() + kBGSPEED * 2 * pSecondsElapsed);
-	    		if (getY() >= CAMERA_HEIGHT) setY(-CAMERA_HEIGHT);
-	    		super.onManagedUpdate(pSecondsElapsed);
-	    	}
-	    };
-	    
-	    backgroundLayer.attachChild(starfield1);
-	    backgroundLayer.attachChild(starfield2);
+	    createBackgroundSprite(mTRBackground, 0, kBGSPEED);
+	    createBackgroundSprite(mTRBackground, -CAMERA_HEIGHT, kBGSPEED);
+	    createBackgroundSprite(mTRStarfield, 0, kBGSPEED * 2);
+	    createBackgroundSprite(mTRStarfield, -CAMERA_HEIGHT, kBGSPEED * 2);
 	    
 	    // cat
 	    
@@ -247,8 +217,8 @@ public class MainActivity extends SimpleBaseGameActivity
 	    scene.registerTouchArea(emptyRight);
 	    scene.setTouchAreaBindingOnActionDownEnabled(true);
 	    
-	    spaceCatLayer.attachChild(emptyLeft);
-	    spaceCatLayer.attachChild(emptyRight);
+	    mSpaceCatLayer.attachChild(emptyLeft);
+	    mSpaceCatLayer.attachChild(emptyRight);
 	    
 	    return scene;
 	}
