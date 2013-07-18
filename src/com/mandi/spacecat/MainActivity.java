@@ -5,9 +5,7 @@ import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.Entity;
-import org.andengine.entity.IEntity;
-import org.andengine.entity.modifier.LoopEntityModifier;
-import org.andengine.entity.modifier.MoveByModifier;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -17,23 +15,22 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
-import org.andengine.util.algorithm.Spiral;
 
 public class MainActivity extends SimpleBaseGameActivity
 {
-	
 	private Camera camera;
 	private BitmapTextureAtlas mTexSpaceCat;
-	private BitmapTextureAtlas mTexOtherStuff;
 	private BitmapTextureAtlas mTexBackground;
 	
 	private ITextureRegion mTRSpacecat;
-	private ITextureRegion mTREmpty;
 	private ITextureRegion mTRBackground;
 	private ITextureRegion mTRStarfield;
 	
 	private static final int CAMERA_WIDTH = 768;
 	private static final int CAMERA_HEIGHT = 1280;
+	
+	private final float kCATSPEED = 500f;
+	private final float kBGSPEED  = 80f;
 
 	private Sprite mSpaceCat;
 
@@ -60,27 +57,16 @@ public class MainActivity extends SimpleBaseGameActivity
 	{
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		mTexSpaceCat = new BitmapTextureAtlas(getTextureManager(), 512, 512, TextureOptions.DEFAULT);
-		mTexOtherStuff = new BitmapTextureAtlas(getTextureManager(), 512, 512, TextureOptions.DEFAULT);
 		mTexBackground = new BitmapTextureAtlas(getTextureManager(), 2048, 2048, TextureOptions.DEFAULT);
 		
 		mTRSpacecat = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTexSpaceCat, this, "space_cat.png", 0, 0);
-		mTREmpty = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTexOtherStuff, this, "empty.png", 0, 0);
 		
 		mTRBackground = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTexBackground, this, "background.png", 0, 0);
 		mTRStarfield = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTexBackground, this, "starfield.png", 769, 0);
 		
 		mTexSpaceCat.load(); 
-		mTexOtherStuff.load();
 		mTexBackground.load();
 	}
-
-	private final int LAYER0 = 0;
-	
-	private final float kSPRITESCALEW = 2f;
-	private final float kSPRITESCALEH = 3f;
-	
-	private final float kCATSPEED = 500f;
-	private final float kBGSPEED  = 80f;
 	
 	private void createBackgroundSprite(ITextureRegion bg, final float initialHeight, final float speed)
 	{
@@ -113,20 +99,12 @@ public class MainActivity extends SimpleBaseGameActivity
 	    createBackgroundSprite(mTRStarfield, 0, kBGSPEED * 2);
 	    createBackgroundSprite(mTRStarfield, -CAMERA_HEIGHT, kBGSPEED * 2);
 	    
-	    // cat
-	    
+	    // create spacecat
 	    mSpaceCat = new Sprite((CAMERA_WIDTH - mTRSpacecat.getWidth()) / 2, 
 	    		CAMERA_HEIGHT - mTRSpacecat.getHeight(), mTRSpacecat, getVertexBufferObjectManager());
-	    scene.getChildByIndex(LAYER0).attachChild(mSpaceCat);
+	    mSpaceCatLayer.attachChild(mSpaceCat);
 	    
-	    
-	    Sprite emptyLeft = new Sprite(
-	    		0, 
-	    		CAMERA_HEIGHT-mTREmpty.getHeight() * kSPRITESCALEH, 
-	    		mTREmpty.getWidth() * kSPRITESCALEW, 
-	    		mTREmpty.getHeight() * kSPRITESCALEH, 
-	    		mTREmpty, 
-	    		getVertexBufferObjectManager())
+	    Rectangle steerButtonLeft = new Rectangle(0, CAMERA_HEIGHT - 350, CAMERA_WIDTH / 2, 350, getVertexBufferObjectManager())
 	    {
 	    	boolean steerLeft;
 	    	
@@ -164,13 +142,7 @@ public class MainActivity extends SimpleBaseGameActivity
 	    	}
 	    };
 	    
-	    Sprite emptyRight = new Sprite(
-	    		CAMERA_WIDTH - mTREmpty.getWidth() * kSPRITESCALEW, 
-	    		CAMERA_HEIGHT-mTREmpty.getHeight() * kSPRITESCALEH, 
-	    		mTREmpty.getWidth() * kSPRITESCALEW, 
-	    		mTREmpty.getHeight() * kSPRITESCALEH, 
-	    		mTREmpty, 
-	    		getVertexBufferObjectManager())
+	    Rectangle steerButtonRight = new Rectangle(CAMERA_WIDTH / 2, CAMERA_HEIGHT - 350, CAMERA_WIDTH / 2, 350, getVertexBufferObjectManager())
 	    {
 	    	boolean steerRight;
 	    	
@@ -213,12 +185,14 @@ public class MainActivity extends SimpleBaseGameActivity
 	    };
 	    
 	    
-	    scene.registerTouchArea(emptyLeft);
-	    scene.registerTouchArea(emptyRight);
+	    scene.registerTouchArea(steerButtonLeft);
+	    scene.registerTouchArea(steerButtonRight);
 	    scene.setTouchAreaBindingOnActionDownEnabled(true);
-	    
-	    mSpaceCatLayer.attachChild(emptyLeft);
-	    mSpaceCatLayer.attachChild(emptyRight);
+	
+	    steerButtonLeft.setVisible(false);
+	    steerButtonRight.setVisible(false);
+	    mSpaceCatLayer.attachChild(steerButtonLeft);
+	    mSpaceCatLayer.attachChild(steerButtonRight);
 	    
 	    return scene;
 	}
