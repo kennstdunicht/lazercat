@@ -29,8 +29,8 @@ public class MainActivity extends SimpleBaseGameActivity
 	private static final int CAMERA_WIDTH = 768;
 	private static final int CAMERA_HEIGHT = 1280;
 	
-	private final float kCATSPEED = 500f;
-	private final float kBGSPEED  = 80f;
+	private final float kCATSPEED = 600f;
+	private final float kBGSPEED  = 160f;
 
 	private Sprite mSpaceCat;
 	
@@ -72,7 +72,7 @@ public class MainActivity extends SimpleBaseGameActivity
 		mTexBackground.load();
 	}
 	
-	private void createBackgroundSprite(ITextureRegion bg, final float initialHeight, final float speed)
+	private Sprite createBackgroundSprite(ITextureRegion bg, final float initialHeight, final float speed)
 	{
 	    // background
 	    Sprite background = new Sprite(0, initialHeight, bg, getVertexBufferObjectManager())
@@ -87,6 +87,8 @@ public class MainActivity extends SimpleBaseGameActivity
 	    };
 	    
 	    mBackgroundLayer.attachChild(background);
+	    
+	    return background;
 	}
 	
 	@Override
@@ -102,6 +104,10 @@ public class MainActivity extends SimpleBaseGameActivity
 	    createBackgroundSprite(mTRBackground, -CAMERA_HEIGHT, kBGSPEED);
 	    createBackgroundSprite(mTRStarfield, 0, kBGSPEED * 2);
 	    createBackgroundSprite(mTRStarfield, -CAMERA_HEIGHT, kBGSPEED * 2);
+	    Sprite s1 = createBackgroundSprite(mTRStarfield, 0, kBGSPEED * 3);
+	    Sprite s2 = createBackgroundSprite(mTRStarfield, -CAMERA_HEIGHT, kBGSPEED * 3);
+	    s1.setRotation(180);
+	    s2.setRotation(180);
 	    
 	    // create spacecat
 	    mSpaceCat = new Sprite((CAMERA_WIDTH - mTRSpacecat.getWidth()) / 2, 
