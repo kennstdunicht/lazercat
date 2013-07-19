@@ -33,7 +33,10 @@ public class MainActivity extends SimpleBaseGameActivity
 	private final float kBGSPEED  = 80f;
 
 	private Sprite mSpaceCat;
-
+	
+	private boolean mSteerRightPressed;
+	private boolean mSteerLeftPressed;
+	
     Entity mSpaceCatLayer = new Entity();
     Entity mBackgroundLayer = new Entity();
 	
@@ -101,34 +104,14 @@ public class MainActivity extends SimpleBaseGameActivity
 	    
 	    // create spacecat
 	    mSpaceCat = new Sprite((CAMERA_WIDTH - mTRSpacecat.getWidth()) / 2, 
-	    		CAMERA_HEIGHT - mTRSpacecat.getHeight(), mTRSpacecat, getVertexBufferObjectManager());
-	    mSpaceCatLayer.attachChild(mSpaceCat);
-	    
-	    Rectangle steerButtonLeft = new Rectangle(0, CAMERA_HEIGHT - 350, CAMERA_WIDTH / 2, 350, getVertexBufferObjectManager())
+	    		CAMERA_HEIGHT - mTRSpacecat.getHeight(), mTRSpacecat, getVertexBufferObjectManager())
 	    {
-	    	boolean steerLeft;
-	    	
-	    	@Override
-	    	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
-	    			float pTouchAreaLocalX, float pTouchAreaLocalY) 
-	    	{		
-	    		if (pSceneTouchEvent.isActionDown())
-	    		{
-	    			steerLeft = true;
-	    		}
-	    		else if (pSceneTouchEvent.isActionUp())
-	    		{
-	    			steerLeft = false;
-	    		}
-	    		
-	    		// TODO Auto-generated method stub
-	    		return true;
-	    	}
-	    	
 	    	@Override
 	    	protected void onManagedUpdate(float pSecondsElapsed) 
 	    	{
-	    		if (steerLeft)
+	    		//System.out.println("steerleft" + mSteerLeftPressed + "steerRight" + mSteerRightPressed);
+	    		
+	    		if (mSteerLeftPressed && !mSteerRightPressed)
 	    		{
 	    			mSpaceCat.setPosition(mSpaceCat.getX() - kCATSPEED * pSecondsElapsed, mSpaceCat.getY());	
 	    			if (mSpaceCat.getX() <= 0)
@@ -136,51 +119,59 @@ public class MainActivity extends SimpleBaseGameActivity
 	    				mSpaceCat.setX(0);
 	    			}
 	    		}
-	    		
+	    		else if (mSteerRightPressed && !mSteerLeftPressed)
+	    		{
+	    			mSpaceCat.setPosition(mSpaceCat.getX() + kCATSPEED * pSecondsElapsed, mSpaceCat.getY());
+	    			if (mSpaceCat.getX() >= CAMERA_WIDTH - mTRSpacecat.getWidth())
+	    			{
+	    				mSpaceCat.setX(CAMERA_WIDTH - mTRSpacecat.getWidth());
+	    			}
+	    		}
 	    		// TODO Auto-generated method stub
 	    		super.onManagedUpdate(pSecondsElapsed);
+	    	}
+	    };
+	    mSpaceCatLayer.attachChild(mSpaceCat);
+	    
+	    Rectangle steerButtonLeft = new Rectangle(0, CAMERA_HEIGHT - 350, CAMERA_WIDTH / 2, 350, getVertexBufferObjectManager())
+	    {
+	    	@Override
+	    	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+	    			float pTouchAreaLocalX, float pTouchAreaLocalY) 
+	    	{		
+	    		if (pSceneTouchEvent.isActionDown())
+	    		{
+	    			mSteerLeftPressed = true;
+	    		}
+	    		else if (pSceneTouchEvent.isActionUp())
+	    		{
+	    			mSteerLeftPressed = false;
+	    		}
+	    		
+	    		// TODO Auto-generated method stub
+	    		return true;
 	    	}
 	    };
 	    
 	    Rectangle steerButtonRight = new Rectangle(CAMERA_WIDTH / 2, CAMERA_HEIGHT - 350, CAMERA_WIDTH / 2, 350, getVertexBufferObjectManager())
 	    {
-	    	boolean steerRight;
-	    	
 	    	@Override
 	    	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 	    			float pTouchAreaLocalX, float pTouchAreaLocalY) 
 	    	{
 	    		if (pSceneTouchEvent.isActionDown())
 	    		{
-	    			System.out.println("isActionDown");
-	    			steerRight = true;
+	    			mSteerRightPressed = true;
 	    		}
 	    		else if (pSceneTouchEvent.isActionUp())
 	    		{
 	    			System.out.println("isActionUp");
-	    			steerRight = false;
+	    			mSteerRightPressed = false;
 	    			
 	    		}
 	    		
 	    		// TODO Auto-generated method stub
 	    		return true;
-	    	}
-	    	
-	    	@Override
-	    	protected void onManagedUpdate(float pSecondsElapsed) 
-	    	{
-	    		// TODO Auto-generated method stub
-	    		super.onManagedUpdate(pSecondsElapsed);
-	    		
-	    		if (steerRight)
-	    		{
-	    			mSpaceCat.setPosition(mSpaceCat.getX() + kCATSPEED * pSecondsElapsed, mSpaceCat.getY());
-	    			
-	    			if (mSpaceCat.getX() >= CAMERA_WIDTH - mTRSpacecat.getWidth())
-	    			{
-	    				mSpaceCat.setX(CAMERA_WIDTH - mTRSpacecat.getWidth());
-	    			}
-	    		}
 	    	}
 	    };
 	    
