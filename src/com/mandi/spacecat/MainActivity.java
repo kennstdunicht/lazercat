@@ -46,6 +46,7 @@ public class MainActivity extends SimpleBaseGameActivity
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, 
 		new FillResolutionPolicy(), camera);
+		engineOptions.getTouchOptions().setNeedsMultiTouch(true);
 		return engineOptions;
 	}
 
